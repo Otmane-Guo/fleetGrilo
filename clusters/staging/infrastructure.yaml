@@ -120,4 +120,55 @@ spec:
     name: flux-system
   path: ./infrastructure/observability
   prune: true
-  validation: client  
+  validation: client 
+
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta1
+kind: Kustomization
+metadata:
+  name: efk-setup
+  namespace: flux-system
+spec:
+  dependsOn:
+    - name: kyverno-policies
+  interval: 5m
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  path: ./infrastructure/efk-setup
+  prune: true
+  validation: client
+  
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta1
+kind: Kustomization
+metadata:
+  name: efk-init
+  namespace: flux-system
+spec:
+  dependsOn:
+    - name: efk-setup
+  interval: 5m
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  path: ./infrastructure/efk-init
+  prune: true
+  validation: client
+
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta1
+kind: Kustomization
+metadata:
+  name: efk-deploy
+  namespace: flux-system
+spec:
+  dependsOn:
+    - name: efk-init
+  interval: 5m
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  path: ./infrastructure/efk-deploy
+  prune: true
+  validation: client
